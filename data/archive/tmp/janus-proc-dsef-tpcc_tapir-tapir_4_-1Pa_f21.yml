@@ -1,0 +1,24 @@
+process:
+  c0: node-13
+  c1: node-12
+  c2: node-15
+  c3: node-14
+  s0: node-1
+  s1: node-10
+  s2: node-11
+  s3: node-1
+  s4: node-10
+  s5: node-11
+site:
+  client:
+  - - c0
+    - c1
+    - c2
+  - - c3
+  server:
+  - - s0:10000
+    - s1:10001
+    - s2:10002
+  - - s3:10003
+    - s4:10004
+    - s5:10005

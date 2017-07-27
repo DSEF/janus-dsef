@@ -1,0 +1,26 @@
+bench:
+  population: {history: 1000000}
+  scale: 1
+  weight: {read: 0, write: 1}
+  workload: rw_benchmark
+client: {forwarding: false, rate: -1, type: closed}
+host: {node-1: node-1, node-10: node-10, node-11: node-11, node-12: node-12, node-13: node-13,
+  node-14: node-14, node-15: node-15, node-16: node-16, node-17: node-17, node-18: node-18,
+  node-19: node-19, node-2: node-2, node-20: node-20, node-3: node-3, node-4: node-4,
+  node-5: node-5, node-6: node-6, node-7: node-7, node-8: node-8, node-9: node-9}
+mode: {ab: brq, batch: false, cc: brq, ongoing: 1, retry: 20}
+n_concurrent: 1
+process: {c0: node-16, s0: node-1, s1: node-10, s2: node-11, s3: node-1, s4: node-10,
+  s5: node-11}
+schema:
+- column:
+  - {name: h_key, primary: true, type: integer}
+  - {name: h_c_id, type: integer}
+  name: history
+sharding: {history: MOD}
+site:
+  client:
+  - [c0]
+  server:
+  - ['s0:10000', 's1:10001', 's2:10002']
+  - ['s3:10003', 's4:10004', 's5:10005']

@@ -1,0 +1,55 @@
+I [s_main.cc:122] 2017-06-16 15:45:27.877 | PWD : 
+I [s_main.cc:134] 2017-06-16 15:45:27.877 | starting process 14768
+I [config.cc:269] 2017-06-16 15:45:27.877 | LoadYML: /users/sgt43/janus/tmp/janus-final-dsefXr0hUn.yml
+I [config.cc:382] 2017-06-16 15:45:27.889 | BuildSiteProcMap
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:619] 2017-06-16 15:45:27.891 | group size: 2
+I [config.cc:643] 2017-06-16 15:45:27.891 | client forwarding: 0
+I [config.cc:301] 2017-06-16 15:45:27.891 | # of concurrent requests: 1
+I [s_main.cc:69] 2017-06-16 15:45:27.892 | server enabled, number of sites: 2
+I [s_main.cc:94] 2017-06-16 15:45:27.892 | waiting for client setup threads.
+I [s_main.cc:77] 2017-06-16 15:45:27.892 | launching site: 1, bind address 0.0.0.0:10001
+I [s_main.cc:77] 2017-06-16 15:45:27.892 | launching site: 4, bind address 0.0.0.0:10004
+I [server_worker.cc:78] 2017-06-16 15:45:27.908 | start data population for site 1
+I [server_worker.cc:78] 2017-06-16 15:45:27.908 | start data population for site 4
+I [server_worker.cc:106] 2017-06-16 15:45:35.407 | data populated for site: 1, partition: 0
+I [s_main.cc:85] 2017-06-16 15:45:35.407 | table popped for site 1
+I [server_worker.cc:123] 2017-06-16 15:45:35.407 | enter SetupService for s1 @ 0.0.0.0:10001
+I [server.cpp:434] 2017-06-16 15:45:35.407 | rrr::Server: started on 0.0.0.0:10001
+I [server_worker.cc:174] 2017-06-16 15:45:35.407 | Server s1 ready at 0.0.0.0:10001
+I [s_main.cc:88] 2017-06-16 15:45:35.407 | start communication for site 1
+I [communicator.cc:157] 2017-06-16 15:45:35.407 | connect to site: node-1:10000 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.409 | connect to site: node-10:10001 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.409 | connect to site: node-11:10002 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.410 | connect to site: node-1:10003 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.410 | connect to site: node-10:10004 (attempt 0)
+E [client.cpp:139] 2017-06-16 15:45:35.410 | rrr::Client: connect(node-10:10004): Connection refused
+I [server_worker.cc:106] 2017-06-16 15:45:35.457 | data populated for site: 4, partition: 1
+I [s_main.cc:85] 2017-06-16 15:45:35.457 | table popped for site 4
+I [server_worker.cc:123] 2017-06-16 15:45:35.457 | enter SetupService for s4 @ 0.0.0.0:10004
+I [server.cpp:434] 2017-06-16 15:45:35.457 | rrr::Server: started on 0.0.0.0:10004
+I [server_worker.cc:174] 2017-06-16 15:45:35.457 | Server s4 ready at 0.0.0.0:10004
+I [s_main.cc:88] 2017-06-16 15:45:35.457 | start communication for site 4
+I [communicator.cc:157] 2017-06-16 15:45:35.457 | connect to site: node-1:10000 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.458 | connect to site: node-10:10001 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.458 | connect to site: node-11:10002 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.458 | connect to site: node-1:10003 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.459 | connect to site: node-10:10004 (attempt 0)
+I [communicator.cc:157] 2017-06-16 15:45:35.459 | connect to site: node-11:10005 (attempt 0)
+I [s_main.cc:90] 2017-06-16 15:45:35.460 | site 4 launched!
+I [communicator.cc:157] 2017-06-16 15:45:36.410 | connect to site: node-10:10004 (attempt 1)
+I [communicator.cc:157] 2017-06-16 15:45:36.411 | connect to site: node-11:10005 (attempt 0)
+I [s_main.cc:90] 2017-06-16 15:45:36.411 | site 1 launched!
+I [s_main.cc:98] 2017-06-16 15:45:36.411 | done waiting for client setup threads.
+I [server.cpp:434] 2017-06-16 15:45:36.412 | rrr::Server: started on 0.0.0.0:20001
+I [server_worker.cc:33] 2017-06-16 15:45:36.412 | heartbeat setup for s1 on 0.0.0.0:20001
+I [server.cpp:434] 2017-06-16 15:45:36.412 | rrr::Server: started on 0.0.0.0:20004
+I [server_worker.cc:33] 2017-06-16 15:45:36.412 | heartbeat setup for s4 on 0.0.0.0:20004
+I [s_main.cc:105] 2017-06-16 15:45:36.412 | server workers' communicators setup

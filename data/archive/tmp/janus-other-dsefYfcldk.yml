@@ -1,0 +1,7 @@
+mode:
+  ab: tapir
+  batch: false
+  cc: tapir
+  ongoing: 1
+  read_only: occ
+  retry: 20
