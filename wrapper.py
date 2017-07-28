@@ -6,6 +6,8 @@ import os
 import signal
 from time import sleep
 import sys
+from gen_experiments import main as gen
+import copy
 
 NUM_TRIES = 10
 
@@ -16,10 +18,9 @@ class WrapperService(rpyc.Service):
     def on_disconnect(self):
         pass
 
-    # def exposed_setup(self, exp_id, name, config_file, duration = 60, server_timeout = 10,
-    #                   rpc_port = 5555, status_time_interval = 5, wait = False, single_server = 0,
-    #                   taskset_schema = 0, client_taskset = False, recording_path = "", interest_txn = "NEW ORDER"):
-    def exposed_setup(self, experiment_dict)
+    def exposed_setup(self, ed, hosts):
+        ed = copy.deepcopy(ed)
+        hosts = copy.deepcopy(hosts)
         self.run_process = subprocess.Popen(['./dsef/run.py'])
 
         self.conn = None
@@ -40,8 +41,8 @@ class WrapperService(rpyc.Service):
         self.root = self.conn.root
         print('Connected to process: {}'.format(self.run_process.pid))
 
-        # self.root.setup(exp_id, name, config_file, duration, server_timeout, rpc_port, status_time_interval, wait, single_server, taskset_schema, client_taskset, recording_path, interest_txn)
-        self.root.setup(experiment_dict)
+        gen(ed, hosts)
+        self.root.setup(ed, hosts)
 
     def exposed_launch(self):
         self.root.launch()
@@ -55,9 +56,6 @@ class WrapperService(rpyc.Service):
         self.conn.close()
         self.root = None
         self.run_process.kill()
-
-    def exposed_stop(self):
-        self.close()
 
 if __name__ == "__main__":
     from rpyc.utils.server import *

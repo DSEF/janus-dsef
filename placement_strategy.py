@@ -10,7 +10,6 @@ class ClientPlacement:
     WITH_LEADER = 'with_leader'
     BALANCED = 'balanced'
 
-
 class BalancedPlacementStrategy:
 	def generate_layout(self, args, num_c, num_s, num_replicas, hosts_config):
 		data_centers = args['data_centers']
@@ -20,7 +19,7 @@ class BalancedPlacementStrategy:
 		self.num_s = num_s
 		self.num_replicas = num_replicas
 
-		hosts = self.hosts_by_datacenter(hosts_config['host'].keys(), data_centers)
+		hosts = self.hosts_by_datacenter(hosts_config.keys(), data_centers)
 		server_names = [ 's'+str(i) for i in range(num_s * num_replicas) ]
 		client_names = [ 'c'+str(i) for i in range(num_c) ]
 

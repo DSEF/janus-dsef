@@ -21,6 +21,7 @@ from multiprocessing import Lock
 import yaml
 import tempfile
 from collections import OrderedDict
+import copy
 
 # third-party python modules
 from tabulate import tabulate
@@ -871,73 +872,6 @@ class ServerController(object):
         for t in t_list:
             t.join()
 
-
-def create_parser():
-    parser = ArgumentParser()
-
-    parser.add_argument('-n', "--name", dest="experiment_name",
-                        help="name of experiment",
-                        default=None)
-    parser.add_argument('-id', dest="experiment_id", default="-1")
-    parser.add_argument("-f", "--file", dest="config_files",
-            help="read config from FILE, default is sample.yml",
-            action='append',
-            default=[], metavar="FILE")
-
-    parser.add_argument("-P", "--port", dest="rpc_port", help="port to use",
-            default=5555, metavar="PORT")
-
-    parser.add_argument("-t", "--server-timeout", dest="s_timeout",
-            help="server heart beat timeout in seconds", default=10,
-            action="store", metavar="TIMEOUT", type=int)
-
-    parser.add_argument("-i", "--status-time-interval", dest="c_timeout",
-            help="time interval to report benchmark status in seconds",
-            default=5, action="store", metavar="TIME", type=int)
-
-    parser.add_argument("-w", "--wait", dest="wait",
-                        help="wait after starting processes",
-                        default=False, action="store_true")
-
-    parser.add_argument("-d", "--duration", dest="c_duration",
-            help="benchmark running duration in seconds", default=60,
-            action="store", metavar="TIME", type=int)
-
-    parser.add_argument("-S", "--single-server", dest="c_single_server",
-            help="control each client always touch the same server "
-                 "0, disabled; 1, each thread will touch a single server; "
-                 "2, each process will touch a single server",
-            default=0, action="store", metavar="[0|1|2]")
-
-    parser.add_argument("-T", "--taskset-schema", dest="s_taskset",
-            help="Choose which core to run each server on. "
-                 "0: auto; "
-                 "1: CPU 1; "
-                 "2: CPU 0, odd cores; "
-                 "3: CPU 0, even cores;",
-            default=0, action="store", metavar="[0|1|2|3]")
-
-    parser.add_argument("-c", "--client-taskset", dest="c_taskset",
-            help="taskset client processes round robin", default=False,
-            action="store_true")
-
-    parser.add_argument("-l", "--log-dir", dest="log_dir",
-            help="Log file directory", default=g_log_dir,
-            metavar="LOG_DIR")
-
-    parser.add_argument("-r", "--recording-path", dest="recording_path",
-            help="Recording path", default="", metavar="RECORDING_PATH")
-
-    parser.add_argument("-x", "--interest-txn", dest="interest_txn",
-            help="interest txn", default=g_interest_txn,
-            metavar="INTEREST_TXN")
-
-    parser.add_argument("-H", "--hosts", dest="hosts_path",
-            help="hosts path", default="./config/hosts-local",
-            metavar="HOSTS_PATH")
-    logger.debug(parser)
-    return parser
-
 class TrialConfig:
     def __init__(self):
         self.experiment_id = None
@@ -1089,48 +1023,6 @@ class ProcessInfo:
     def reset_ids():
         ProcessInfo.id = -1
 
-
-# def build_config(options):
-
-def main():
-    ret = 0
-    server_controller = None
-    client_controller = None
-    config = None
-    try:
-        # config = build_config(create_parser().parse_args())
-        # setup_experiment(config)
-
-        process_infos = get_process_info(config)
-        server_controller = ServerController(config, process_infos)
-        logger.debug("before server_controller.start");
-        server_controller.start()
-        logger.debug("after server_controller.start");
-
-        client_controller = ClientController(config, process_infos)
-
-        if config['args'].wait:
-            raw_input("press <enter> to start")
-
-        process = server_controller.setup_heartbeat(client_controller)
-        if process is not None:
-            process.join()
-
-    except Exception:
-        logging.error(traceback.format_exc())
-        ret = 1
-    finally:
-        logging.info("shutting down...")
-        if server_controller is not None:
-            try:
-                # comment the following line when doing profiling
-                server_controller.server_kill()
-                pass
-            except:
-                logging.error(traceback.format_exc())
-        if ret != 0:
-            sys.exit(ret)
-
 class ExperimentService(rpyc.Service):
     def on_connect(self):
         self.server_controller = None
@@ -1145,24 +1037,25 @@ class ExperimentService(rpyc.Service):
     def exposed_set_verbosity(self, logger_level):
         logger.setLevel(logger_level)
 
-    def exposed_setup(self, exp_id, name, config_file, duration, server_timeout,
-                      rpc_port, status_time_interval, wait, single_server,
-                      taskset_schema, client_taskset, recording_path, interest_txn):
-        self.config = self.build_config(config_file)
+    def exposed_setup(self, conf, hosts):
+        conf = copy.deepcopy(conf)
+        hosts = copy.deepcopy(hosts)
+        self.config = self.build_config(conf['config_file'])
         self.config['args'] = TrialConfig()
-        self.config['args'].experiment_id = exp_id
-        self.config['args'].experiment_name = name
-        self.config['args'].config_file = config_file
-        self.config['args'].c_duration = duration
-        self.config['args'].s_timeout = server_timeout
-        self.config['args'].rpc_port = rpc_port
-        self.config['args'].c_timeout = status_time_interval
-        self.config['args'].wait = wait
-        self.config['args'].c_singe_server = single_server
-        self.config['args'].s_taskset = taskset_schema
-        self.config['args'].c_taskset = client_taskset
-        self.config['args'].recording_path = recording_path
-        self.config['args'].interest_txn = interest_txn
+        self.config['args'].experiment_id = conf['id']
+        self.config['args'].experiment_name = conf['name']
+        self.config['args'].config_file = conf['config_file']
+        self.config['args'].c_duration = conf['duration']
+        self.config['args'].s_timeout = conf['server_timeout']
+        self.config['args'].rpc_port = conf['rpc_port']
+        self.config['args'].c_timeout = conf['status_time_interval']
+        self.config['args'].wait = conf['wait']
+        self.config['args'].c_singe_server = conf['single_server']
+        self.config['args'].s_taskset = conf['taskset_schema']
+        self.config['args'].c_taskset = conf['client_taskset']
+        self.config['args'].recording_path = conf['recording_path']
+        self.config['args'].interest_txn = conf['interest_txn']
+        self.config['host'] = hosts
         self.setup_experiment()
 
     def exposed_launch(self):
@@ -1217,7 +1110,6 @@ class ExperimentService(rpyc.Service):
         root_logger.setLevel(LOG_FILE_LEVEL)
 
         if log_file_path is not None:
-            # print("logging to file: %s" % log_file_path)
             self.fh = logging.FileHandler(log_file_path)
             self.fh.setLevel(LOG_FILE_LEVEL)
             formatter = logging.Formatter(fmt='%(levelname)s: %(asctime)s: %(message)s')

@@ -23,9 +23,14 @@ class Experiment:
         self.dist_sys = dist_sys
         self.port = port
         self.max_retries = max_retries
+        self.client = None
         self.exec_path = "run.py"
         self.conf = conf
-        self.experiment_list = util.product(conf)
+        self.experiment_list = util.product(conf['experiment'])
+        self.hosts = self.conf['host']
+        for i, e in enumerate(self.experiment_list):
+            e.update({'id':i})
+            self.experiment_list[i] = e
 
     def exec_command(self, cmd, block = True):
         if self.client == None:
@@ -48,6 +53,7 @@ class Experiment:
         if not isinstance(files, list):
             files = [files]
 
+        if self.client == None: self.exec_command("ls")
         with SCPClient(self.client.get_transport()) as scp:
             for f in sum([glob.glob(s) for s in files], []):
                 scp.put(f, remote_path = '~/{}/dsef'.format(self.dist_sys))
@@ -57,6 +63,13 @@ class Experiment:
 
     def set_executable(self, path):
         self.exec_path = path
+
+    def run(self):
+        self.init()
+        print('[+] Running {} Experiments'.format(len(self.experiment_list)))
+        for e in self.experiment_list:
+            if not self.start(e): break
+        return self.end()
 
     def init(self):
         print("[+] Connecting ... ", end="")
@@ -80,47 +93,40 @@ class Experiment:
 
         self.results = {}
 
-    def run(self):
-        self.init()
-        print('[+] Running {} Experiments'.format(len(experiments)))
-        for e in experiments:
-            if not self.start(e): break
-        return self.end()
-
-    # def run_experiment(self, exp_id, name, config_file, duration, show_output = False):
     def start(self, exp_dict):
+        self.server_io = None
         try:
-            print("[+] Starting Experiment {}: {}".format(exp_id, name))
-            # self.r.setup(exp_id, name, config_file, duration)
-            self.r.setup(exp_dict)
+            print("[+] Starting Experiment {}".format(exp_dict['id']))
+            self.r.setup(exp_dict, self.hosts)
 
             print("[+] Launching")
             self.r.launch()
 
-            print("[+] Running for {} seconds".format(duration))
-            self.results[exp_id] = pickle.loads(pickle.dumps(self.r.run()))
+            print("[+] Running for {} seconds".format(exp_dict['duration']))
+            self.results[exp_dict['id']] = pickle.loads(pickle.dumps(self.r.run()))
 
             print("[+] Tearing Down")
             self.r.teardown()
 
         except Exception as e:
-            print("[+] There was an exception while running experiment {}!!".format(exp_id))
+            print("[+] There was an exception while running experiment {}!!".format(exp_dict['id']))
             print(e)
 
-            self.server_io[0].close()
-            self.server_io[1].close()
-            self.server_io[2].close()
-            print("[+] RPyC Server stdout")
-            print(str(self.server_io[1].read(), 'ascii'))
-            print("[+] RPyC Server stderr")
-            print(str(self.server_io[2].read(), 'ascii'))
+            if self.server_io != None:
+                self.server_io[0].close()
+                self.server_io[1].close()
+                self.server_io[2].close()
+                print("[+] RPyC Server stdout")
+                print(str(self.server_io[1].read(), 'ascii'))
+                print("[+] RPyC Server stderr")
+                print(str(self.server_io[2].read(), 'ascii'))
+
             return False
 
         return True
 
     def end(self):
         print("[+] Exiting")
-        self.r.stop()
         self.conn.close()
         self.exec_command("rm dsef/* log/*") # TODO: Archive
         self.server_io = None
