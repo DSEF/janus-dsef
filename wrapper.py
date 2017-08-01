@@ -8,10 +8,12 @@ from time import sleep
 import sys
 from gen_experiments import main as gen
 import copy
+from pydsef import Service, experiment
 
 NUM_TRIES = 10
 
-class WrapperService(rpyc.Service):
+# class WrapperService(rpyc.Service):
+class WrapperService(Service):
     def on_connect(self):
         pass
 
