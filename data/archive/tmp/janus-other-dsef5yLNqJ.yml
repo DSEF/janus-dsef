@@ -1,6 +1,0 @@
-mode:
-  ab: tapir
-  batch: false
-  cc: tapir
-  ongoing: 1
-  retry: 20
