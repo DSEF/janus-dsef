@@ -1056,6 +1056,7 @@ class ExperimentService(rpyc.Service):
         self.config['args'].recording_path = conf['recording_path']
         self.config['args'].interest_txn = conf['interest_txn']
         self.config['host'] = hosts
+        self.config['bench']['coefficient'] = conf['zipf']
         self.setup_experiment()
 
     def exposed_launch(self):
